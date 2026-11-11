@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terrain Oscillator</title>
+<link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" data-mode="find">
+
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true" class="mark">
+        <path d="M2 24 C7 24 8 14 12 14 S17 20 20 20 S25 8 30 8" />
+        <path d="M2 28 C8 28 9 19 13 19 S18 24 21 24 S26 14 30 14" />
+      </svg>
+      <span class="word">Terrain <b>Oscillator</b></span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Mode">
+      <button role="tab" id="tabFind" data-mode="find" aria-selected="true">Find</button>
+      <button role="tab" id="tabPlay" data-mode="play" aria-selected="false">Play</button>
+    </nav>
+    <div class="here">
+      <div class="here-name" id="hereName">Mount Fuji</div>
+      <div class="here-meta" id="hereMeta"></div>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+  </header>
+
+  <main>
+    <!-- ======================= FIND ======================= -->
+    <section class="find" id="findView" aria-label="Find a place">
+      <div class="mapwrap">
+        <div id="map"></div>
+        <form class="search" id="searchForm" autocomplete="off">
+          <input id="search" type="search" placeholder="Search any place: Lofoten, Zion, Dolomites…" aria-label="Search a place">
+          <button type="submit">Go</button>
+        </form>
+        <div class="legend">
+          <span><i class="sw edge"></i>frame 1</span>
+          <span><i class="sw arrow"></i>wave direction</span>
+          <span><i class="sw scan"></i>now playing</span>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="block">
+          <h3>Places</h3>
+          <ul class="places" id="places"></ul>
+        </div>
+
+        <div class="block">
+          <h3>Region</h3>
+          <div class="field"><label for="rw">Width</label><input id="rw" type="range" min="0" max="1000" value="700"><output id="rwO"></output></div>
+          <div class="field"><label for="rh">Depth</label><input id="rh" type="range" min="0" max="1000" value="650"><output id="rhO"></output></div>
+          <div class="field"><label for="ang">Direction</label><input id="ang" type="range" min="-180" max="180" value="0"><output id="angO"></output></div>
+          <div class="field seg-field"><span class="lab">Frames</span>
+            <div class="seg" id="framesSeg" role="radiogroup" aria-label="Frames">
+              <button data-v="16">16</button><button data-v="32">32</button><button data-v="64">64</button><button data-v="128">128</button><button data-v="256">256</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="block">
+          <h3>Shape</h3>
+          <div class="field seg-field"><span class="lab">Sea</span>
+            <div class="seg" id="seaSeg" role="radiogroup" aria-label="Sea">
+              <button data-v="flat">Flat</button><button data-v="bathy">Sea floor</button><button data-v="off">As land</button>
+            </div>
+          </div>
+          <div class="field"><label for="gamma">Height curve</label><input id="gamma" type="range" min="0.15" max="1.5" step="0.05" value="0.5"><output id="gammaO"></output></div>
+          <div class="field"><label for="step">Coast step</label><input id="step" type="range" min="0" max="0.5" step="0.01" value="0.2"><output id="stepO"></output></div>
+          <div class="field"><label for="smooth">Smoothing</label><input id="smooth" type="range" min="0" max="12" step="1" value="1"><output id="smoothO"></output></div>
+        </div>
+
+        <div class="block preview">
+          <div class="preview-head"><h3>From above</h3><span class="meta" id="findMeta"></span></div>
+          <canvas id="findPreview"></canvas>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="genBtn">Generate</button>
+          <button class="ghost" id="goPlay">Play it</button>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ======================= PLAY ======================= -->
+    <section class="play" id="playView" aria-label="Play">
+      <div class="stage">
+        <div class="panel view3d">
+          <div class="panel-head"><h3>Terrain</h3><span class="meta" id="frameMeta"></span></div>
+          <canvas id="view3d"></canvas>
+        </div>
+        <div class="stack">
+          <div class="panel">
+            <div class="panel-head"><h3>From above</h3><span class="meta" id="sizeMeta"></span></div>
+            <canvas id="viewTop"></canvas>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Current frame</h3><span class="meta" id="heightMeta"></span></div>
+            <canvas id="viewScope"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="rack">
+        <div class="group">
+          <h3>Flight</h3>
+          <div class="seg seg-param" data-param="scan" aria-label="Scan mode"></div>
+          <div class="knobs" data-knobs="position lfoRate lfoDepth flyTime"></div>
+          <div class="seg seg-param small" data-param="lfoShape" aria-label="LFO shape"></div>
+        </div>
+        <div class="group">
+          <h3>Envelope</h3>
+          <div class="knobs" data-knobs="attack decay sustain release"></div>
+        </div>
+        <div class="group">
+          <h3>Tone</h3>
+          <div class="knobs" data-knobs="cutoff resonance detune"></div>
+        </div>
+        <div class="group">
+          <h3>Output</h3>
+          <div class="knobs" data-knobs="space volume"></div>
+          <div class="seg seg-param small" data-param="loudness" aria-label="Loudness"></div>
+        </div>
+      </div>
+
+      <div class="keys-row">
+        <div class="key-tools">
+          <button id="octDown" aria-label="Octave down">−</button>
+          <span class="meta" id="octMeta">C3</span>
+          <button id="octUp" aria-label="Octave up">+</button>
+          <button id="holdBtn" class="toggle" aria-pressed="false" title="Keys stay down until pressed again">Hold</button>
+        </div>
+        <div class="kbd" id="kbd" aria-label="Keyboard"></div>
+        <div class="file-tools">
+          <div class="seg small" id="expSeg" role="radiogroup" aria-label="Export scaling">
+            <button data-v="abs" title="Real heights: sea at the bottom">Heights</button><button data-v="ctr" title="Each frame centred: no DC offset">Centred</button>
+          </div>
+          <div class="seg small" id="fmtSeg" role="radiogroup" aria-label="File format">
+            <button data-v="wt" title="Bitwig, Surge">.wt</button><button data-v="wav" title="Ableton Wavetable, Serum, Vital">.wav</button>
+          </div>
+          <button id="saveBtn">Save…</button>
+          <button id="bitwigBtn" class="primary">Send to Bitwig</button>
+          <button id="openBtn">Open .wt</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="credits">
+    Elevation: Terrain Tiles on AWS (Mapzen/Tilezen: SRTM, GMTED, ETOPO1, EU-DEM…) · Map: Sentinel-2 cloudless 2016 by EOX (CC BY 4.0), OpenTopoMap (CC-BY-SA) · Search: OpenStreetMap Nominatim · AGPL-3.0
+  </footer>
+</div>
+
+<script src="vendor/leaflet.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
