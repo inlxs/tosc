@@ -30,7 +30,7 @@ a fjord each sound different because they *are* different.
 |---|---|---|
 | Windows 10/11 (64-bit) | `Tosc-…-Windows.zip` | VST3, CLAP, Standalone |
 | macOS 11+ (Apple silicon and Intel) | `Tosc-…-macOS.zip` | AU, VST3, CLAP, Standalone |
-| Linux x86_64 | `Tosc-…-Linux.tar.gz` | VST3, CLAP, Standalone |
+| Linux | build from source (see below); prebuilt downloads coming later | VST3, CLAP, Standalone |
 
 Each download has an `INSTALL.txt` that says where to copy the files. In short:
 
@@ -38,7 +38,7 @@ Each download has an `INSTALL.txt` that says where to copy the files. In short:
   The standalone `.exe` runs from anywhere. It isn't code-signed yet, so SmartScreen asks once: *More info → Run anyway*.
 - **macOS:** copy the plug-ins to `~/Library/Audio/Plug-Ins/` (`Components`, `VST3`, `CLAP`). The builds aren't notarised yet,
   so run the `xattr -dr com.apple.quarantine …` line from `INSTALL.txt` once after copying.
-- **Linux:** copy to `~/.vst3` and `~/.clap`. Needs WebKitGTK 4.1.
+- **Linux:** no prebuilt download yet. Build from source, then copy to `~/.vst3` and `~/.clap` (needs WebKitGTK 4.1).
 
 In your DAW it shows up under the maker **Okllo**. Use the CLAP in Bitwig and Reaper, the VST3 in Ableton Live, and the AU in Logic.
 
@@ -69,7 +69,7 @@ macOS / Linux (see [the workflow](.github/workflows/build.yml) for the Linux pac
 The results go to `build/Tosc_artefacts/Release/`. `RenderTest` renders a test phrase offline.
 To work on the interface without rebuilding, set `TERRAIN_UI_DIR` to the `ui` folder. The app then loads the files from disk.
 
-Every push builds all three systems on GitHub Actions. Pushing a tag such as `v0.1.0` publishes a release with the downloads.
+Every push builds Windows and macOS on GitHub Actions. Pushing a tag such as `v0.1.0` publishes a release with the downloads.
 
 ## Data credits
 

@@ -28,9 +28,11 @@ jobs:
           - name: macOS
             os: macos-latest
             configure: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
-          - name: Linux
-            os: ubuntu-24.04
-            configure: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          # Linux is paused: the dependency step hangs on GitHub's ubuntu-24.04 runners.
+          # The Linux steps below are kept; re-enable by restoring this entry.
+          # - name: Linux
+          #   os: ubuntu-24.04
+          #   configure: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
     steps:
       - uses: actions/checkout@v4
