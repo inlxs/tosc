@@ -1,5 +1,5 @@
 @echo off
-rem Build Terrain Oscillator (Release): Standalone, VST3, CLAP + RenderTest
+rem Build Tosc (Release): Standalone, VST3, CLAP + RenderTest
 rem Needs Visual Studio 2022 (Build Tools or Community) with the C++ workload (includes CMake and Ninja).
 rem CMake downloads the WebView2 SDK on first configure.
 setlocal
@@ -17,4 +17,4 @@ if not exist libs\JUCE\CMakeLists.txt git submodule update --init --recursive ||
 if not exist build\build.ninja cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release || exit /b 1
 cmake --build build %* || exit /b 1
 echo.
-echo Done: build\TerrainOscillator_artefacts\Release\  (Standalone, VST3, CLAP)
+echo Done: build\Tosc_artefacts\Release\  (Standalone, VST3, CLAP)

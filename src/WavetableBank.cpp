@@ -186,7 +186,7 @@ juce::MemoryBlock writeWAV (const Relief& r, bool centred)
     for (auto x : v) data.writeFloat (x);
 
     juce::MemoryOutputStream clm;
-    clm << "<!>2048 01000000 wavetable (Terrain Oscillator)";
+    clm << "<!>2048 01000000 wavetable (Tosc)";
     while (clm.getDataSize() < 48) clm.writeByte (0);
 
     juce::MemoryOutputStream out;

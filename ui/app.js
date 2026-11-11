@@ -1,4 +1,4 @@
-// Terrain Oscillator UI - SPDX-License-Identifier: AGPL-3.0-or-later
+// Tosc UI - SPDX-License-Identifier: AGPL-3.0-or-later
 "use strict";
 
 const N = 2048;

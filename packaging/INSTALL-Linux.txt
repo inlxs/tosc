@@ -1,11 +1,11 @@
-Terrain Oscillator - Linux (x86_64)
-An Okllo instrument - https://okllo.com - https://github.com/inlxs/terrain-oscillator
+Tosc - Linux (x86_64)
+An Okllo instrument - https://okllo.com - https://github.com/inlxs/tosc
 
 Plug-ins
-  VST3: copy "Terrain Oscillator.vst3" to ~/.vst3
-  CLAP: copy "Terrain Oscillator.clap" to ~/.clap
+  VST3: copy "Tosc.vst3" to ~/.vst3
+  CLAP: copy "Tosc.clap" to ~/.clap
 Standalone
-  ./"Terrain Oscillator"
+  ./"Tosc"
 
 Needs WebKitGTK 4.1 and GTK 3 for the interface, e.g. on Debian/Ubuntu:
   sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0

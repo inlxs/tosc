@@ -1,20 +1,20 @@
-Terrain Oscillator - macOS (Apple silicon + Intel, macOS 11 or newer)
-An Okllo instrument - https://okllo.com - https://github.com/inlxs/terrain-oscillator
+Tosc - macOS (Apple silicon + Intel, macOS 11 or newer)
+An Okllo instrument - https://okllo.com - https://github.com/inlxs/tosc
 
 Plug-ins
-  AU   (Logic, GarageBand):  copy "Terrain Oscillator.component" to ~/Library/Audio/Plug-Ins/Components
-  VST3 (Ableton, Bitwig ...): copy "Terrain Oscillator.vst3"      to ~/Library/Audio/Plug-Ins/VST3
-  CLAP (Bitwig, Reaper ...): copy "Terrain Oscillator.clap"      to ~/Library/Audio/Plug-Ins/CLAP
+  AU   (Logic, GarageBand):  copy "Tosc.component" to ~/Library/Audio/Plug-Ins/Components
+  VST3 (Ableton, Bitwig ...): copy "Tosc.vst3"      to ~/Library/Audio/Plug-Ins/VST3
+  CLAP (Bitwig, Reaper ...): copy "Tosc.clap"      to ~/Library/Audio/Plug-Ins/CLAP
 Standalone
-  Copy "Terrain Oscillator.app" to /Applications.
+  Copy "Tosc.app" to /Applications.
 
 These builds are not notarised by Apple yet. After copying, remove the download quarantine once
 in Terminal, otherwise macOS says the plug-in "is damaged" or "cannot be opened":
 
-  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/"Terrain Oscillator.component"
-  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Terrain Oscillator.vst3"
-  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/CLAP/"Terrain Oscillator.clap"
-  xattr -dr com.apple.quarantine /Applications/"Terrain Oscillator.app"
+  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/"Tosc.component"
+  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/VST3/"Tosc.vst3"
+  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/CLAP/"Tosc.clap"
+  xattr -dr com.apple.quarantine /Applications/"Tosc.app"
 
 Then rescan plug-ins in your DAW (in Logic: restart it). It appears under the maker "Okllo".
 An internet connection is needed to load maps and elevation; playing saved tables works offline.

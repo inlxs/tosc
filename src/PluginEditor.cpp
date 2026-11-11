@@ -47,7 +47,7 @@ void TerrainEditor::resized() { web.setBounds (getLocalBounds()); }
 juce::WebBrowserComponent::Options TerrainEditor::makeOptions()
 {
     using Opts = juce::WebBrowserComponent::Options;
-    const auto dataDir = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("TerrainOscillatorWebView");
+    const auto dataDir = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("ToscWebView");
 
     return Opts{}
         .withBackend (Opts::Backend::webview2)
@@ -271,7 +271,7 @@ void TerrainEditor::fnSendToBitwig (const Args& a, Completion done)
     const bool centred = a[0].toString() == "ctr";
     const auto r = proc.getRelief();
     const auto docs = juce::File::getSpecialLocation (juce::File::userDocumentsDirectory);
-    const auto dir = docs.getChildFile ("Bitwig Studio").getChildFile ("Library").getChildFile ("Wavetables").getChildFile ("Terrain Oscillator");
+    const auto dir = docs.getChildFile ("Bitwig Studio").getChildFile ("Library").getChildFile ("Wavetables").getChildFile ("Tosc");
     if (! dir.createDirectory()) { done (juce::var()); return; }
     const auto f = dir.getChildFile (safeFileName (r.name) + (centred ? "_ctr_" : "_abs_") + juce::String (r.frames) + ".wt");
     const auto data = terrain::writeWT (r, centred);

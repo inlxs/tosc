@@ -1,16 +1,16 @@
-Terrain Oscillator - Windows
-An Okllo instrument - https://okllo.com - https://github.com/inlxs/terrain-oscillator
+Tosc - Windows
+An Okllo instrument - https://okllo.com - https://github.com/inlxs/tosc
 
 Standalone
-  Run "Terrain Oscillator.exe". Choose audio output and MIDI input under Options.
+  Run "Tosc.exe". Choose audio output and MIDI input under Options.
   Windows may show a SmartScreen warning because the app is not code-signed yet:
   click "More info" -> "Run anyway".
 
 Plug-ins (Bitwig, Ableton Live, Reaper, FL Studio, Cubase, Studio One ...)
-  VST3: copy the folder "Terrain Oscillator.vst3" to
+  VST3: copy the folder "Tosc.vst3" to
         C:\Program Files\Common Files\VST3
         (or, without admin rights: %LOCALAPPDATA%\Programs\Common\VST3)
-  CLAP: copy "Terrain Oscillator.clap" to
+  CLAP: copy "Tosc.clap" to
         C:\Program Files\Common Files\CLAP
         (or %LOCALAPPDATA%\Programs\Common\CLAP)
   Then rescan plug-ins in your DAW. It appears under the maker "Okllo".

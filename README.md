@@ -1,9 +1,9 @@
-# Terrain Oscillator
+# Tosc
 
-**A wavetable synthesizer that plays real places.** Pick anywhere on Earth, and its terrain becomes the sound.
+**A terrain oscillator: a wavetable synthesizer that plays real places.** Pick anywhere on Earth, and its terrain becomes the sound.
 
-[![Build](https://github.com/inlxs/terrain-oscillator/actions/workflows/build.yml/badge.svg)](https://github.com/inlxs/terrain-oscillator/actions/workflows/build.yml)
-[![Latest release](https://img.shields.io/github/v/release/inlxs/terrain-oscillator?label=download)](https://github.com/inlxs/terrain-oscillator/releases/latest)
+[![Build](https://github.com/inlxs/tosc/actions/workflows/build.yml/badge.svg)](https://github.com/inlxs/tosc/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/inlxs/tosc?label=download)](https://github.com/inlxs/tosc/releases/latest)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 
 An [Okllo](https://okllo.com) instrument, made by inLXS. Standalone app, VST3, CLAP and AU (macOS).
@@ -24,17 +24,17 @@ a fjord each sound different because they *are* different.
 
 ## Download
 
-**[Get the latest release →](https://github.com/inlxs/terrain-oscillator/releases/latest)**
+**[Get the latest release →](https://github.com/inlxs/tosc/releases/latest)**
 
 | System | Download | Formats |
 |---|---|---|
-| Windows 10/11 (64-bit) | `TerrainOscillator-…-Windows.zip` | VST3, CLAP, Standalone |
-| macOS 11+ (Apple silicon and Intel) | `TerrainOscillator-…-macOS.zip` | AU, VST3, CLAP, Standalone |
-| Linux x86_64 | `TerrainOscillator-…-Linux.tar.gz` | VST3, CLAP, Standalone |
+| Windows 10/11 (64-bit) | `Tosc-…-Windows.zip` | VST3, CLAP, Standalone |
+| macOS 11+ (Apple silicon and Intel) | `Tosc-…-macOS.zip` | AU, VST3, CLAP, Standalone |
+| Linux x86_64 | `Tosc-…-Linux.tar.gz` | VST3, CLAP, Standalone |
 
 Each download has an `INSTALL.txt` that says where to copy the files. In short:
 
-- **Windows:** copy `Terrain Oscillator.vst3` to `C:\Program Files\Common Files\VST3` and `Terrain Oscillator.clap` to `C:\Program Files\Common Files\CLAP`.
+- **Windows:** copy `Tosc.vst3` to `C:\Program Files\Common Files\VST3` and `Tosc.clap` to `C:\Program Files\Common Files\CLAP`.
   The standalone `.exe` runs from anywhere. It isn't code-signed yet, so SmartScreen asks once: *More info → Run anyway*.
 - **macOS:** copy the plug-ins to `~/Library/Audio/Plug-Ins/` (`Components`, `VST3`, `CLAP`). The builds aren't notarised yet,
   so run the `xattr -dr com.apple.quarantine …` line from `INSTALL.txt` once after copying.
@@ -57,8 +57,8 @@ In your DAW it shows up under the maker **Okllo**. Use the CLAP in Bitwig and Re
 
 Windows, with Visual Studio 2022 (Build Tools or Community) and the C++ workload:
 
-    git clone --recurse-submodules https://github.com/inlxs/terrain-oscillator.git
-    cd terrain-oscillator
+    git clone --recurse-submodules https://github.com/inlxs/tosc.git
+    cd tosc
     build.bat
 
 macOS / Linux (see [the workflow](.github/workflows/build.yml) for the Linux packages):
@@ -66,7 +66,7 @@ macOS / Linux (see [the workflow](.github/workflows/build.yml) for the Linux pac
     cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
     cmake --build build
 
-The results go to `build/TerrainOscillator_artefacts/Release/`. `RenderTest` renders a test phrase offline.
+The results go to `build/Tosc_artefacts/Release/`. `RenderTest` renders a test phrase offline.
 To work on the interface without rebuilding, set `TERRAIN_UI_DIR` to the `ui` folder. The app then loads the files from disk.
 
 Every push builds all three systems on GitHub Actions. Pushing a tag such as `v0.1.0` publishes a release with the downloads.

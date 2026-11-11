@@ -25,7 +25,7 @@ jobs:
             os: windows-2022
             configure: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
           - name: macOS
-            os: macos-14
+            os: macos-latest
             configure: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release "-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"
           - name: Linux
             os: ubuntu-24.04
@@ -81,47 +81,47 @@ jobs:
             curl -sL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
             unzip -q pv.zip; PV=./pluginval.app/Contents/MacOS/pluginval
           fi
-          "$PV" --strictness-level 5 --skip-gui-tests --validate "build/TerrainOscillator_artefacts/Release/VST3/Terrain Oscillator.vst3"
+          "$PV" --strictness-level 5 --skip-gui-tests --validate "build/Tosc_artefacts/Release/VST3/Tosc.vst3"
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $A = "build/TerrainOscillator_artefacts/Release"
-          $D = "dist/Terrain Oscillator"
+          $A = "build/Tosc_artefacts/Release"
+          $D = "dist/Tosc"
           New-Item -ItemType Directory -Force $D | Out-Null
-          Copy-Item -Recurse "$A/VST3/Terrain Oscillator.vst3" $D
-          Copy-Item "$A/CLAP/Terrain Oscillator.clap" $D
-          Copy-Item "$A/Standalone/Terrain Oscillator.exe" $D
+          Copy-Item -Recurse "$A/VST3/Tosc.vst3" $D
+          Copy-Item "$A/CLAP/Tosc.clap" $D
+          Copy-Item "$A/Standalone/Tosc.exe" $D
           Copy-Item packaging/INSTALL-Windows.txt "$D/INSTALL.txt"
           Copy-Item LICENSE "$D/LICENSE.txt"
-          Compress-Archive -Path $D -DestinationPath "dist/TerrainOscillator-${{ steps.v.outputs.version }}-Windows.zip"
+          Compress-Archive -Path $D -DestinationPath "dist/Tosc-${{ steps.v.outputs.version }}-Windows.zip"
 
       - name: Package (macOS)
         if: runner.os == 'macOS'
         run: |
-          A="build/TerrainOscillator_artefacts/Release"
-          D="dist/Terrain Oscillator"
+          A="build/Tosc_artefacts/Release"
+          D="dist/Tosc"
           mkdir -p "$D"
-          cp -R "$A/VST3/Terrain Oscillator.vst3" "$A/AU/Terrain Oscillator.component" "$A/CLAP/Terrain Oscillator.clap" "$A/Standalone/Terrain Oscillator.app" "$D/"
+          cp -R "$A/VST3/Tosc.vst3" "$A/AU/Tosc.component" "$A/CLAP/Tosc.clap" "$A/Standalone/Tosc.app" "$D/"
           # ad-hoc signature (not notarised): see INSTALL.txt for the Gatekeeper step
           for b in "$D"/*.vst3 "$D"/*.component "$D"/*.clap "$D"/*.app; do codesign --force --deep -s - "$b"; done
           cp packaging/INSTALL-macOS.txt "$D/INSTALL.txt"; cp LICENSE "$D/LICENSE.txt"
-          (cd dist && ditto -c -k --keepParent "Terrain Oscillator" "TerrainOscillator-${{ steps.v.outputs.version }}-macOS.zip")
+          (cd dist && ditto -c -k --keepParent "Tosc" "Tosc-${{ steps.v.outputs.version }}-macOS.zip")
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
         run: |
-          A="build/TerrainOscillator_artefacts/Release"
-          D="dist/Terrain Oscillator"
+          A="build/Tosc_artefacts/Release"
+          D="dist/Tosc"
           mkdir -p "$D"
-          cp -R "$A/VST3/Terrain Oscillator.vst3" "$A/CLAP/Terrain Oscillator.clap" "$A/Standalone/Terrain Oscillator" "$D/"
+          cp -R "$A/VST3/Tosc.vst3" "$A/CLAP/Tosc.clap" "$A/Standalone/Tosc" "$D/"
           cp packaging/INSTALL-Linux.txt "$D/INSTALL.txt"; cp LICENSE "$D/LICENSE.txt"
-          tar -C dist -czf "dist/TerrainOscillator-${{ steps.v.outputs.version }}-Linux.tar.gz" "Terrain Oscillator"
+          tar -C dist -czf "dist/Tosc-${{ steps.v.outputs.version }}-Linux.tar.gz" "Tosc"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TerrainOscillator-${{ matrix.name }}
+          name: Tosc-${{ matrix.name }}
           path: |
             dist/*.zip
             dist/*.tar.gz
@@ -142,7 +142,7 @@ jobs:
           merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:
-          name: Terrain Oscillator ${{ github.ref_name }}
+          name: Tosc ${{ github.ref_name }}
           body_path: packaging/RELEASE.md
           generate_release_notes: true
           files: |
