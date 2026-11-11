@@ -368,8 +368,11 @@ function drawRegion() {
 let suppressMove = false;
 map.on("move", () => {
   if (suppressMove) return;
-  const c = map.getCenter();
-  S.region.lat = c.lat; S.region.lon = ((c.lng + 540) % 360) - 180;
+  const c = map.getCenter(), lon = ((c.lng + 540) % 360) - 180;
+  // ignore tiny moves (window resize, re-centring): only a real pan makes it a new place
+  const dE = (lon - S.region.lon) * 111320 * Math.cos(S.region.lat * deg), dN = (c.lat - S.region.lat) * 110540;
+  if (Math.hypot(dE, dN) < 0.02 * Math.min(S.region.w, S.region.h)) return;
+  S.region.lat = c.lat; S.region.lon = lon;
   drawRegion(); markStale("Custom");
 });
 function markStale(name) { if (name) S.pendingName = name; $("#genBtn").classList.add("stale"); $$(".places button").forEach((b) => b.classList.remove("on")); }

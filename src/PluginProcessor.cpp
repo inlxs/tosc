@@ -21,12 +21,17 @@ APVTS::ParameterLayout TerrainProcessor::createLayout()
 {
     using namespace juce;
     APVTS::ParameterLayout l;
+    // Readable values for hosts and the UI: "20 ms", "1.20 s", "7.0 kHz", "0.20 Hz", "7.0 ct"
     auto pct = AudioParameterFloatAttributes().withStringFromValueFunction ([] (float v, int) { return String (v, 2); });
-    auto secs = AudioParameterFloatAttributes().withLabel ("s");
+    auto secs = AudioParameterFloatAttributes().withStringFromValueFunction ([] (float v, int)
+        { return v < 1.0f ? String (roundToInt (v * 1000.0f)) + " ms" : String (v, v < 10.0f ? 2 : 1) + " s"; });
+    auto hz = AudioParameterFloatAttributes().withStringFromValueFunction ([] (float v, int)
+        { return v >= 1000.0f ? String (v / 1000.0f, 1) + " kHz" : v >= 100.0f ? String (roundToInt (v)) + " Hz" : String (v, 2) + " Hz"; });
+    auto cents = AudioParameterFloatAttributes().withStringFromValueFunction ([] (float v, int) { return String (v, 1) + " ct"; });
 
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "position", 1 }, "Position", NormalisableRange<float> (0.0f, 1.0f), 0.5f, pct));
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "scan", 1 }, "Scan", StringArray { "Off", "LFO sweep", "Fly per note", "Fly, looping" }, 1));
-    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "lfoRate", 1 }, "LFO rate", skewed (0.01f, 12.0f, 0.3f), 0.2f, AudioParameterFloatAttributes().withLabel ("Hz")));
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "lfoRate", 1 }, "LFO rate", skewed (0.01f, 12.0f, 0.3f), 0.2f, hz));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "lfoDepth", 1 }, "LFO depth", NormalisableRange<float> (0.0f, 1.0f), 0.6f, pct));
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "lfoShape", 1 }, "LFO shape", StringArray { "Triangle", "Sine", "Ramp" }, 0));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "flyTime", 1 }, "Fly time", skewed (0.5f, 30.0f, 6.0f), 6.0f, secs));
@@ -34,9 +39,9 @@ APVTS::ParameterLayout TerrainProcessor::createLayout()
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "decay", 1 }, "Decay", skewed (0.01f, 6.0f, 0.8f), 0.6f, secs));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "sustain", 1 }, "Sustain", NormalisableRange<float> (0.0f, 1.0f), 0.75f, pct));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "release", 1 }, "Release", skewed (0.01f, 8.0f, 1.2f), 1.2f, secs));
-    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "cutoff", 1 }, "Cutoff", skewed (60.0f, 18000.0f, 1500.0f), 7000.0f, AudioParameterFloatAttributes().withLabel ("Hz")));
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "cutoff", 1 }, "Cutoff", skewed (60.0f, 18000.0f, 1500.0f), 7000.0f, hz));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "resonance", 1 }, "Resonance", skewed (0.5f, 12.0f, 2.0f), 0.9f, pct));
-    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "detune", 1 }, "Stereo detune", NormalisableRange<float> (0.0f, 40.0f), 7.0f, AudioParameterFloatAttributes().withLabel ("ct")));
+    l.add (std::make_unique<AudioParameterFloat> (ParameterID { "detune", 1 }, "Stereo detune", NormalisableRange<float> (0.0f, 40.0f), 7.0f, cents));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "space", 1 }, "Space", NormalisableRange<float> (0.0f, 1.0f), 0.3f, pct));
     l.add (std::make_unique<AudioParameterFloat> (ParameterID { "volume", 1 }, "Volume", NormalisableRange<float> (0.0f, 1.0f), 0.6f, pct));
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "loudness", 1 }, "Loudness", StringArray { "Follows terrain", "Even per frame" }, 0));

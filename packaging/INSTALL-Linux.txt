@@ -1,0 +1,12 @@
+Terrain Oscillator - Linux (x86_64)
+An Okllo instrument - https://okllo.com - https://github.com/inlxs/terrain-oscillator
+
+Plug-ins
+  VST3: copy "Terrain Oscillator.vst3" to ~/.vst3
+  CLAP: copy "Terrain Oscillator.clap" to ~/.clap
+Standalone
+  ./"Terrain Oscillator"
+
+Needs WebKitGTK 4.1 and GTK 3 for the interface, e.g. on Debian/Ubuntu:
+  sudo apt install libwebkit2gtk-4.1-0 libgtk-3-0
+Built on Ubuntu 24.04. An internet connection is needed to load maps and elevation.

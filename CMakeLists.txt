@@ -1,15 +1,37 @@
 cmake_minimum_required(VERSION 3.22)
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
 project(TerrainOscillator VERSION 0.1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-# WebView2 SDK (headers + static loader) vendored from NuGet: libs/nuget/Microsoft.Web.WebView2.*
-set(JUCE_WEBVIEW2_PACKAGE_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libs/nuget")
+# --- Windows: WebView2 SDK (headers + static loader) from NuGet, fetched on first configure
+if(WIN32)
+    set(WV2_VERSION 1.0.2903.40)
+    set(WV2_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libs/nuget/Microsoft.Web.WebView2.${WV2_VERSION}")
+    if(NOT EXISTS "${WV2_DIR}/build/native/include/WebView2.h")
+        message(STATUS "Downloading Microsoft.Web.WebView2 ${WV2_VERSION}")
+        file(DOWNLOAD "https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/${WV2_VERSION}"
+             "${WV2_DIR}/package.zip" STATUS wv2_status TLS_VERIFY ON)
+        list(GET wv2_status 0 wv2_code)
+        if(NOT wv2_code EQUAL 0)
+            message(FATAL_ERROR "WebView2 download failed: ${wv2_status}")
+        endif()
+        file(ARCHIVE_EXTRACT INPUT "${WV2_DIR}/package.zip" DESTINATION "${WV2_DIR}")
+        file(REMOVE "${WV2_DIR}/package.zip")
+    endif()
+    set(JUCE_WEBVIEW2_PACKAGE_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/libs/nuget")
+endif()
 
 add_subdirectory(libs/JUCE)
 add_subdirectory(libs/clap-juce-extensions EXCLUDE_FROM_ALL)
+
+set(TO_FORMATS Standalone VST3)
+if(APPLE)
+    list(APPEND TO_FORMATS AU)
+endif()
 
 juce_add_plugin(TerrainOscillator
     COMPANY_NAME "Okllo"
@@ -17,14 +39,16 @@ juce_add_plugin(TerrainOscillator
     BUNDLE_ID "com.okllo.terrainoscillator"
     PLUGIN_MANUFACTURER_CODE Oklo
     PLUGIN_CODE Tosc
-    FORMATS Standalone VST3
+    FORMATS ${TO_FORMATS}
     PRODUCT_NAME "Terrain Oscillator"
     IS_SYNTH TRUE
     NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE
-    NEEDS_WEBVIEW2 TRUE
+    NEEDS_WEBVIEW2 TRUE          # Windows: WebView2
+    NEEDS_WEB_BROWSER TRUE       # Linux: webkit2gtk
+    AU_MAIN_TYPE kAudioUnitType_MusicDevice
     COPY_PLUGIN_AFTER_BUILD FALSE
     VST3_CATEGORIES Instrument Synth)
 

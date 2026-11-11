@@ -120,8 +120,9 @@ button:disabled { opacity: 0.5; cursor: progress; }
 .key-tools, .file-tools { display: flex; align-items: center; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
 .key-tools button { padding: 6px 10px; }
 .toggle[aria-pressed="true"] { background: var(--sand); color: var(--ink); border-color: var(--sand); }
-.file-tools { flex-wrap: wrap; justify-content: flex-end; max-width: 440px; }
+.file-tools { flex-wrap: wrap; justify-content: flex-end; max-width: 380px; row-gap: 6px; }
 .file-tools .seg { flex: 0 0 auto; }
+.file-tools .seg button { flex: none; overflow: visible; padding: 4px 9px; }
 .kbd { position: relative; display: flex; height: 84px; touch-action: none; }
 .kbd .w { flex: 1; background: var(--key-w); border: 1px solid var(--bg); border-radius: 0 0 5px 5px; position: relative; }
 .kbd .w span { position: absolute; bottom: 5px; inset-inline: 0; text-align: center; font: 9.5px var(--f-mono); color: #7a7466; }

@@ -1,46 +1,84 @@
 # Terrain Oscillator
 
-An [Okllo](https://okllo.com) instrument.
+**A wavetable synthesizer that plays real places.** Pick anywhere on Earth, and its terrain becomes the sound.
 
-A wavetable synthesizer that plays real places. Pick a region anywhere on Earth,
-and its elevation becomes a wavetable: each frame is one line across the land,
-and sweeping through the table flies you across it.
+[![Build](https://github.com/inlxs/terrain-oscillator/actions/workflows/build.yml/badge.svg)](https://github.com/inlxs/terrain-oscillator/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/inlxs/terrain-oscillator?label=download)](https://github.com/inlxs/terrain-oscillator/releases/latest)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 
-Standalone app, VST3 and CLAP (Windows now; macOS/Linux builds planned).
+An [Okllo](https://okllo.com) instrument, made by inLXS. Standalone app, VST3, CLAP and AU (macOS).
 
-## Status
-- Stage 1 (done): C++ engine. Band-limited wavetables (11 mip levels), 16 voices,
-  scan modes (manual, LFO sweep, fly per note, fly looping), envelope, filter,
-  stereo detune, reverb. Every control is automatable. The table is saved
-  with your project. Built-in default table: Mount Fuji (Copernicus GLO-30).
-- Stage 2 (done): web interface inside the plugin, with a Find mode (map, region, generate)
-  and a Play mode (terrain views, knobs, keys). Includes .wt import, export and Send to Bitwig.
-- Stage 3: video recording.
-- Stage 4: installers and CI builds for Windows, macOS and Linux.
+![Play: flying over the Matterhorn](docs/images/play-matterhorn.png)
 
-## Build (Windows)
-Requires Visual Studio 2022 Build Tools (C++), which include CMake and Ninja.
+## How it works
+
+Each frame of the wavetable is one line across the land. Sweeping through the table flies you across it:
+mountains become loud, bright peaks, valleys become dips, and the sea is silence. A canyon, a caldera and
+a fjord each sound different because they *are* different.
+
+1. **Find:** move the map, search any place, or pick one of the landmarks. Set the size and direction of the box and press **Generate**.
+2. **Play:** play it from a MIDI keyboard, the computer keyboard or the on-screen keys. The white line shows where you are flying.
+3. **Use it anywhere:** automate the flight in your DAW, or export the table as `.wt` (Bitwig, Surge) or `.wav` (Ableton Wavetable, Serum, Vital).
+
+![Find: the Grand Canyon](docs/images/find-grand-canyon.jpg)
+
+## Download
+
+**[Get the latest release →](https://github.com/inlxs/terrain-oscillator/releases/latest)**
+
+| System | Download | Formats |
+|---|---|---|
+| Windows 10/11 (64-bit) | `TerrainOscillator-…-Windows.zip` | VST3, CLAP, Standalone |
+| macOS 11+ (Apple silicon and Intel) | `TerrainOscillator-…-macOS.zip` | AU, VST3, CLAP, Standalone |
+| Linux x86_64 | `TerrainOscillator-…-Linux.tar.gz` | VST3, CLAP, Standalone |
+
+Each download has an `INSTALL.txt` that says where to copy the files. In short:
+
+- **Windows:** copy `Terrain Oscillator.vst3` to `C:\Program Files\Common Files\VST3` and `Terrain Oscillator.clap` to `C:\Program Files\Common Files\CLAP`.
+  The standalone `.exe` runs from anywhere. It isn't code-signed yet, so SmartScreen asks once: *More info → Run anyway*.
+- **macOS:** copy the plug-ins to `~/Library/Audio/Plug-Ins/` (`Components`, `VST3`, `CLAP`). The builds aren't notarised yet,
+  so run the `xattr -dr com.apple.quarantine …` line from `INSTALL.txt` once after copying.
+- **Linux:** copy to `~/.vst3` and `~/.clap`. Needs WebKitGTK 4.1.
+
+In your DAW it shows up under the maker **Okllo**. Use the CLAP in Bitwig and Reaper, the VST3 in Ableton Live, and the AU in Logic.
+
+## Features
+
+- **The whole planet:** elevation from the open [Terrain Tiles on AWS](https://registry.opendata.aws/terrain-tiles/), about 30 m detail on land plus sea floor. The map is Sentinel-2 satellite imagery or a topographic map.
+- **Shape controls:** flat sea or sea floor, a height curve that lifts lowlands, a coast step, smoothing, and 16 to 256 frames.
+- **Engine:** band-limited wavetables (11 mip levels, no aliasing on high notes), 16 voices, stereo detune, filter, envelope and reverb.
+- **Flight modes:** manual, LFO sweep, *fly per note* (each note travels across the land), and looping flight.
+- **DAW friendly:** every control can be automated, and the table and the place are saved with your project.
+- **MIDI:** the mod wheel flies across the terrain. CC74 cutoff, CC71 resonance, CC73 attack, CC72 release, CC91 space, CC7 volume.
+- **Export:** `.wt` for Bitwig and Surge, `.wav` for Ableton Wavetable, Serum and Vital, or **Send to Bitwig**, which writes straight into your Bitwig library.
+- **Command-line tool:** [`tools/terrain2wt.py`](tools/) turns any GeoTIFF into wavetables, including your own drone survey (OpenDroneMap DSM), national lidar or Copernicus 30 m.
+
+## Build from source
+
+Windows, with Visual Studio 2022 (Build Tools or Community) and the C++ workload:
 
     git clone --recurse-submodules https://github.com/inlxs/terrain-oscillator.git
     cd terrain-oscillator
     build.bat
 
-`build.bat` also fetches the submodules and the Microsoft WebView2 SDK (NuGet) on first run.
+macOS / Linux (see [the workflow](.github/workflows/build.yml) for the Linux packages):
 
-Artefacts land in `build/TerrainOscillator_artefacts/Release/` (Standalone, VST3, CLAP).
-`build/RenderTest_artefacts/Release/RenderTest.exe out.wav` renders a test phrase offline.
+    cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+    cmake --build build
 
-## Command-line tools
-See `tools/` - `terrain2wt.py` exports wavetables from any GeoTIFF (drone DSM, lidar) or Copernicus 30 m, no app needed.
+The results go to `build/TerrainOscillator_artefacts/Release/`. `RenderTest` renders a test phrase offline.
+To work on the interface without rebuilding, set `TERRAIN_UI_DIR` to the `ui` folder. The app then loads the files from disk.
+
+Every push builds all three systems on GitHub Actions. Pushing a tag such as `v0.1.0` publishes a release with the downloads.
 
 ## Data credits
-- Elevation: Terrain Tiles on AWS (Mapzen/Tilezen) - SRTM, GMTED, ETOPO1, EU-DEM and others.
-  https://github.com/tilezen/joerd/blob/master/docs/attribution.md
-- Optional: Copernicus GLO-30 DEM. Produced using Copernicus WorldDEM-30
-  (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018,
-  provided under COPERNICUS by the European Union and ESA.
-- Map imagery: Sentinel-2 cloudless 2016 by EOX IT Services GmbH (CC BY 4.0), OpenTopoMap (CC-BY-SA).
+
+- Elevation: Terrain Tiles on AWS (Mapzen/Tilezen): SRTM, GMTED, ETOPO1, EU-DEM and others ([attribution](https://github.com/tilezen/joerd/blob/master/docs/attribution.md)).
+- Built-in default table and `terrain2wt.py --copernicus`: Copernicus GLO-30 DEM, produced using Copernicus WorldDEM-30
+  © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA.
+- Map imagery: Sentinel-2 cloudless 2016 by EOX IT Services GmbH (CC BY 4.0), OpenTopoMap (CC-BY-SA). Search: OpenStreetMap Nominatim.
 
 ## Licence
-AGPL-3.0-or-later (see LICENSE). Built with JUCE (AGPLv3), clap-juce-extensions (MIT) and Leaflet (BSD-2-Clause, bundled in ui/vendor).
-Made by inLXS. Released under the Okllo name (https://okllo.com).
+
+AGPL-3.0-or-later (see [LICENSE](LICENSE)). Built with JUCE (AGPLv3), clap-juce-extensions (MIT) and Leaflet (BSD-2-Clause).
+Made by inLXS · released under the [Okllo](https://okllo.com) name.

@@ -2,6 +2,7 @@
 #include "WavetableBank.h"
 #include <cmath>
 #include <complex>
+#include <cstring>
 
 namespace terrain
 {

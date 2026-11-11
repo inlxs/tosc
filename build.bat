@@ -1,6 +1,7 @@
 @echo off
 rem Build Terrain Oscillator (Release): Standalone, VST3, CLAP + RenderTest
-rem Needs Visual Studio 2022 Build Tools with the C++ workload (includes CMake and Ninja).
+rem Needs Visual Studio 2022 (Build Tools or Community) with the C++ workload (includes CMake and Ninja).
+rem CMake downloads the WebView2 SDK on first configure.
 setlocal
 cd /d "%~dp0"
 
@@ -12,17 +13,6 @@ set "PATH=%CM%\CMake\bin;%CM%\Ninja;%PATH%"
 
 rem Submodules (JUCE, clap-juce-extensions)
 if not exist libs\JUCE\CMakeLists.txt git submodule update --init --recursive || exit /b 1
-
-rem WebView2 SDK from NuGet (headers + static loader); downloaded, not stored in git
-set "WV2=Microsoft.Web.WebView2.1.0.2903.40"
-set "WV2DIR=libs\nuget\%WV2%"
-if not exist "%WV2DIR%\build\native\include\WebView2.h" (
-  echo Downloading %WV2% ...
-  if not exist "%WV2DIR%" mkdir "%WV2DIR%"
-  curl -sL -o "%WV2DIR%\package.zip" "https://www.nuget.org/api/v2/package/Microsoft.Web.WebView2/1.0.2903.40" || exit /b 1
-  tar -xf "%WV2DIR%\package.zip" -C "%WV2DIR%" || exit /b 1
-  del /q "%WV2DIR%\package.zip"
-)
 
 if not exist build\build.ninja cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release || exit /b 1
 cmake --build build %* || exit /b 1
