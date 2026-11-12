@@ -46,10 +46,17 @@ In your DAW it shows up under the maker **Okllo**. Use the CLAP in Bitwig and Re
 
 - **The whole planet:** elevation from the open [Terrain Tiles on AWS](https://registry.opendata.aws/terrain-tiles/), about 30 m detail on land plus sea floor. The map is Sentinel-2 satellite imagery or a topographic map.
 - **Shape controls:** flat sea or sea floor, a height curve that lifts lowlands, a coast step, smoothing, and 16 to 256 frames.
-- **Engine:** band-limited wavetables (11 mip levels, no aliasing on high notes), 16 voices, stereo detune, filter, envelope and reverb.
+- **Engine:** band-limited wavetables (11 mip levels, no aliasing on high notes) and 16 voices, each with:
+  - up to 7 unison oscillators with detune and stereo width, a sine sub and analog-style drift;
+  - its own filter: a 24 dB transistor ladder or a 12 dB nonlinear state-variable filter (LP, BP, HP), with anti-aliased drive and resonance that self-oscillates;
+  - a filter envelope (amount up or down, key tracking, velocity) and an analog-style amp envelope;
+  - glide, pitch bend and the sustain pedal.
+- **Effects:** Juno-style chorus, ping-pong delay, a plate or hall reverb, and a look-ahead limiter.
+- **Factory sounds:** Terrain pad, Glass pluck, Ridge bass, Fly over, Wind drone and Ridge lead.
 - **Flight modes:** manual, LFO sweep, *fly per note* (each note travels across the land), and looping flight.
 - **DAW friendly:** every control can be automated, and the table and the place are saved with your project.
-- **MIDI:** the mod wheel flies across the terrain. CC74 cutoff, CC71 resonance, CC73 attack, CC72 release, CC91 space, CC7 volume.
+- **MIDI:** the mod wheel flies across the terrain. CC74 cutoff, CC71 resonance, CC73 attack, CC75 decay, CC72 release,
+  CC5 glide, CC93 chorus, CC91 reverb, CC7 volume, CC64 sustain, and pitch bend (±2 semitones).
 - **Export:** `.wt` for Bitwig and Surge, `.wav` for Ableton Wavetable, Serum and Vital, or **Send to Bitwig**, which writes straight into your Bitwig library.
 - **Command-line tool:** [`tools/terrain2wt.py`](tools/) turns any GeoTIFF into wavetables, including your own drone survey (OpenDroneMap DSM), national lidar or Copernicus 30 m.
 

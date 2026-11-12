@@ -444,8 +444,19 @@ const ARC = (v) => {
   const [x0, y0] = p(a0), [x1, y1] = p(a1);
   return `M${x0.toFixed(2)} ${y0.toFixed(2)} A${r} ${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
 };
-const LABELS = { position: "Position", lfoRate: "Rate", lfoDepth: "Depth", flyTime: "Fly time", attack: "Attack", decay: "Decay",
-  sustain: "Sustain", release: "Release", cutoff: "Cutoff", resonance: "Reso", detune: "Detune", space: "Space", volume: "Volume" };
+const LABELS = { position: "Position", lfoRate: "Rate", lfoDepth: "Depth", flyTime: "Fly time",
+  unison: "Unison", detune: "Detune", width: "Width", sub: "Sub", drift: "Drift", glide: "Glide",
+  attack: "Attack", decay: "Decay", sustain: "Sustain", release: "Release",
+  cutoff: "Cutoff", res: "Reso", drive: "Drive", envAmount: "Env amt", keyTrack: "Key trk",
+  fAttack: "Attack", fDecay: "Decay", fSustain: "Sustain", fRelease: "Release",
+  chorus: "Chorus", delayMix: "Delay", delayTime: "Time", delayFeedback: "Feedbk", space: "Reverb", size: "Size", volume: "Volume" };
+// Sends a knob value and shows the engine's formatted readout ("1.20 s", "2.4 kHz").
+function setParamShown(id, v) {
+  return Native.call("setParam", id, v).then((text) => {
+    if (typeof text === "string" && text && knobs[id]) knobs[id].el.querySelector(".k-val").textContent = text;
+    if (S.params[id]) { S.params[id].value = v; if (text) S.params[id].text = text; }
+  });
+}
 function makeKnob(id) {
   const el = document.createElement("div");
   el.className = "knob"; el.tabIndex = 0; el.setAttribute("role", "slider"); el.setAttribute("aria-label", LABELS[id] || id);
@@ -454,7 +465,7 @@ function makeKnob(id) {
   const k = { el, id, value: 0 };
   knobs[id] = k;
   let startY = 0, startV = 0, dragging = false, pending = null, raf = 0;
-  const send = (v) => { pending = v; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (pending != null) Native.call("setParam", id, pending); pending = null; }); };
+  const send = (v) => { pending = v; if (!raf) raf = requestAnimationFrame(() => { raf = 0; if (pending != null) setParamShown(id, pending); pending = null; }); };
   el.addEventListener("pointerdown", (e) => {
     el.setPointerCapture(e.pointerId); dragging = true; startY = e.clientY; startV = k.value;
     Native.call("beginEdit", id); e.preventDefault();
@@ -466,12 +477,12 @@ function makeKnob(id) {
   });
   const end = () => { if (!dragging) return; dragging = false; Native.call("endEdit", id); };
   el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
-  el.addEventListener("dblclick", () => { const d = S.params[id]?.default ?? 0.5; Native.call("beginEdit", id); setKnob(id, d); Native.call("setParam", id, d); Native.call("endEdit", id); });
-  el.addEventListener("wheel", (e) => { e.preventDefault(); const v = clamp(k.value - Math.sign(e.deltaY) * 0.02, 0, 1); Native.call("beginEdit", id); setKnob(id, v); Native.call("setParam", id, v); Native.call("endEdit", id); }, { passive: false });
+  el.addEventListener("dblclick", () => { const d = S.params[id]?.default ?? 0.5; Native.call("beginEdit", id); setKnob(id, d); setParamShown(id, d); Native.call("endEdit", id); });
+  el.addEventListener("wheel", (e) => { e.preventDefault(); const v = clamp(k.value - Math.sign(e.deltaY) * 0.02, 0, 1); Native.call("beginEdit", id); setKnob(id, v); setParamShown(id, v); Native.call("endEdit", id); }, { passive: false });
   el.addEventListener("keydown", (e) => {
     const d = e.key === "ArrowUp" || e.key === "ArrowRight" ? 0.01 : e.key === "ArrowDown" || e.key === "ArrowLeft" ? -0.01 : 0;
     if (!d) return; e.preventDefault(); e.stopPropagation();
-    const v = clamp(k.value + d * (e.shiftKey ? 5 : 1), 0, 1); Native.call("beginEdit", id); setKnob(id, v); Native.call("setParam", id, v); Native.call("endEdit", id);
+    const v = clamp(k.value + d * (e.shiftKey ? 5 : 1), 0, 1); Native.call("beginEdit", id); setKnob(id, v); setParamShown(id, v); Native.call("endEdit", id);
   });
   return el;
 }
@@ -614,6 +625,22 @@ function loadFromEngine(st) {
   afterTable();
 }
 Native.on("params", (list) => list.forEach(applyParam));
+
+// ------------------------------------------------------------------ sounds (factory presets)
+function buildPresets(names, current) {
+  const sel = $("#presetSel"); sel.innerHTML = "";
+  (names || []).forEach((n, i) => { const o = document.createElement("option"); o.value = String(i); o.textContent = n; sel.appendChild(o); });
+  const i = (names || []).indexOf(current); sel.value = String(i >= 0 ? i : 0);
+}
+async function loadPreset(i) {
+  const sel = $("#presetSel"), n = sel.options.length; if (!n) return;
+  i = ((i % n) + n) % n; sel.value = String(i);
+  const name = await Native.call("loadPreset", i);
+  setStatus(`Sound: ${name}`);
+}
+$("#presetSel").addEventListener("change", (e) => { loadPreset(+e.target.value); e.target.blur(); });  // blur: letter keys play notes again
+$("#presetPrev").addEventListener("click", () => loadPreset(+$("#presetSel").value - 1));
+$("#presetNext").addEventListener("click", () => loadPreset(+$("#presetSel").value + 1));
 Native.on("live", (d) => { S.livePos = d.pos; S.voices = d.voices; });
 Native.on("relief", (d) => loadFromEngine(d));
 
@@ -626,6 +653,7 @@ async function boot() {
     (st.params || []).forEach((p) => { S.params[p.id] = p; });
     buildSegParams();
     (st.params || []).forEach(applyParam);
+    buildPresets(st.presets, st.preset);
     loadFromEngine(st);
     setStatus(st.standalone ? "Standalone · audio and MIDI settings under Options" : "");
   } else {

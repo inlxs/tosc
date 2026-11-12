@@ -35,7 +35,7 @@ TerrainEditor::TerrainEditor (TerrainProcessor& p)
     addAndMakeVisible (web);
     setResizable (true, true);
     setResizeLimits (860, 560, 2400, 1600);
-    setSize (1100, 720);
+    setSize (1160, 800);
     web.goToURL (juce::WebBrowserComponent::getResourceProviderRoot());
     startTimerHz (30);
 }
@@ -70,6 +70,9 @@ juce::WebBrowserComponent::Options TerrainEditor::makeOptions()
                 {
                     prm->setValueNotifyingHost ((float) (double) a[1]);
                     lastSent[a[0].toString()] = prm->getValue();
+                    // The 30 Hz update skips values the UI sent itself, so the readout comes back here.
+                    done (prm->getCurrentValueAsText() + (prm->getLabel().isNotEmpty() ? " " + prm->getLabel() : juce::String()));
+                    return;
                 }
             done ({});
         })
@@ -95,7 +98,12 @@ juce::WebBrowserComponent::Options TerrainEditor::makeOptions()
         .withNativeFunction ("setRelief", [this] (const Args& a, Completion done) { fnSetRelief (a, std::move (done)); })
         .withNativeFunction ("exportWT",  [this] (const Args& a, Completion done) { fnExport (a, std::move (done)); })
         .withNativeFunction ("sendToBitwig", [this] (const Args& a, Completion done) { fnSendToBitwig (a, std::move (done)); })
-        .withNativeFunction ("openWT",    [this] (const Args& a, Completion done) { fnOpen (a, std::move (done)); });
+        .withNativeFunction ("openWT",    [this] (const Args& a, Completion done) { fnOpen (a, std::move (done)); })
+        .withNativeFunction ("loadPreset", [this] (const Args& a, Completion done)
+        {
+            if (a.size() >= 1) proc.loadPreset ((int) a[0]);
+            done (proc.getPresetName());
+        });
 }
 
 std::optional<juce::WebBrowserComponent::Resource> TerrainEditor::getResource (const juce::String& url)
@@ -188,6 +196,10 @@ juce::var TerrainEditor::stateForUI()
     o->setProperty ("relief", reliefForUI());
     o->setProperty ("region", regionForUI());
     o->setProperty ("params", paramsForUI (false));
+    juce::Array<juce::var> names;
+    for (auto& n : TerrainProcessor::presetNames()) names.add (n);
+    o->setProperty ("presets", names);
+    o->setProperty ("preset", proc.getPresetName());
     o->setProperty ("standalone", juce::JUCEApplicationBase::isStandaloneApp());
     o->setProperty ("version", JucePlugin_VersionString);
     return o;

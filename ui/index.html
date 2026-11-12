@@ -110,24 +110,33 @@
       </div>
 
       <div class="rack">
-        <div class="group">
-          <h3>Flight</h3>
-          <div class="seg seg-param" data-param="scan" aria-label="Scan mode"></div>
-          <div class="knobs" data-knobs="position lfoRate lfoDepth flyTime"></div>
-          <div class="seg seg-param small" data-param="lfoShape" aria-label="LFO shape"></div>
+        <div class="rack-row">
+          <div class="group">
+            <div class="g-head"><h3>Flight</h3><div class="seg seg-param small" data-param="scan" aria-label="Scan mode"></div><div class="seg seg-param small" data-param="lfoShape" aria-label="LFO shape"></div></div>
+            <div class="knobs" data-knobs="position lfoRate lfoDepth flyTime"></div>
+          </div>
+          <div class="group">
+            <div class="g-head"><h3>Oscillator</h3><div class="seg seg-param small" data-param="loudness" aria-label="Frame loudness" title="Frame loudness: follows the terrain, or every frame equally loud"></div></div>
+            <div class="knobs" data-knobs="unison detune width sub drift glide"></div>
+          </div>
+          <div class="group">
+            <div class="g-head"><h3>Amp envelope</h3></div>
+            <div class="knobs" data-knobs="attack decay sustain release"></div>
+          </div>
         </div>
-        <div class="group">
-          <h3>Envelope</h3>
-          <div class="knobs" data-knobs="attack decay sustain release"></div>
-        </div>
-        <div class="group">
-          <h3>Tone</h3>
-          <div class="knobs" data-knobs="cutoff resonance detune"></div>
-        </div>
-        <div class="group">
-          <h3>Output</h3>
-          <div class="knobs" data-knobs="space volume"></div>
-          <div class="seg seg-param small" data-param="loudness" aria-label="Loudness"></div>
+        <div class="rack-row">
+          <div class="group">
+            <div class="g-head"><h3>Filter</h3><div class="seg seg-param small" data-param="filterModel" aria-label="Filter model"></div><div class="seg seg-param small" data-param="filterMode" aria-label="Filter mode"></div></div>
+            <div class="knobs" data-knobs="cutoff res drive envAmount keyTrack"></div>
+          </div>
+          <div class="group">
+            <div class="g-head"><h3>Filter envelope</h3></div>
+            <div class="knobs" data-knobs="fAttack fDecay fSustain fRelease"></div>
+          </div>
+          <div class="group">
+            <div class="g-head"><h3>Effects</h3><div class="seg seg-param small" data-param="reverbType" aria-label="Reverb type"></div></div>
+            <div class="knobs" data-knobs="chorus delayMix delayTime delayFeedback space size"></div>
+          </div>
         </div>
       </div>
 
@@ -137,6 +146,12 @@
           <span class="meta" id="octMeta">C3</span>
           <button id="octUp" aria-label="Octave up">+</button>
           <button id="holdBtn" class="toggle" aria-pressed="false" title="Keys stay down until pressed again">Hold</button>
+          <span class="sep"></span>
+          <button id="presetPrev" aria-label="Previous sound">‹</button>
+          <select id="presetSel" aria-label="Sound"></select>
+          <button id="presetNext" aria-label="Next sound">›</button>
+          <span class="sep"></span>
+          <div class="knobs mini" data-knobs="volume"></div>
         </div>
         <div class="kbd" id="kbd" aria-label="Keyboard"></div>
         <div class="file-tools">

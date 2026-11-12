@@ -52,6 +52,27 @@ public:
         return sa + (sb - sa) * fr;
     }
 
+    // The two frames around a position, for reading many phases (unison) at one position.
+    struct Slice { const float* a; const float* b; float fr; };
+    inline Slice at (int level, float pos) const noexcept
+    {
+        const float fp = pos * (float) (numFrames - 1);
+        const int f0 = (int) fp;
+        const int f1 = f0 + 1 < numFrames ? f0 + 1 : f0;
+        const float* base = data.data() + (size_t) level * (size_t) numFrames * kSamples;
+        return { base + (size_t) f0 * kSamples, base + (size_t) f1 * kSamples, fp - (float) f0 };
+    }
+    static inline float read (const Slice& s, double phase) noexcept
+    {
+        const double x = phase * kSamples;
+        const int xi = (int) x;
+        const int j0 = xi & (kSamples - 1), j1 = (j0 + 1) & (kSamples - 1);
+        const float jf = (float) (x - (double) xi);
+        const float sa = s.a[j0] + (s.a[j1] - s.a[j0]) * jf;
+        const float sb = s.b[j0] + (s.b[j1] - s.b[j0]) * jf;
+        return sa + (sb - sa) * s.fr;
+    }
+
 private:
     int numFrames = 0;
     std::vector<float> data;   // kLevels * numFrames * kSamples

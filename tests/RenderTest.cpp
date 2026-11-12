@@ -1,5 +1,5 @@
 // Offline render test: drives TerrainProcessor without a host and writes a WAV.
-// Usage: RenderTest <out.wav> [scan 0..3]
+// Usage: RenderTest <out.wav> [scan 0..3 | -1 = keep] [preset index]
 #include <juce_audio_formats/juce_audio_formats.h>
 #include "../src/PluginProcessor.h"
 
@@ -9,7 +9,8 @@ int main (int argc, char** argv)
     const juce::File out (argc > 1 ? juce::String (argv[1]) : juce::File::getCurrentWorkingDirectory().getChildFile ("render.wav").getFullPathName());
 
     TerrainProcessor proc;
-    if (argc > 2)
+    if (argc > 3) proc.loadPreset (juce::String (argv[3]).getIntValue());
+    if (argc > 2 && juce::String (argv[2]).getIntValue() >= 0)
         if (auto* p = proc.apvts.getParameter ("scan")) p->setValueNotifyingHost (p->convertTo0to1 ((float) juce::String (argv[2]).getIntValue()));
 
     const double sr = 48000.0;
@@ -67,7 +68,7 @@ int main (int argc, char** argv)
             writer->writeFromAudioSampleBuffer (all, 0, all.getNumSamples());
         }
 
-    std::printf ("table: %s, %d frames\n", r1.name.toRawUTF8(), r1.frames);
+    std::printf ("table: %s, %d frames, sound: %s\n", r1.name.toRawUTF8(), r1.frames, proc.getPresetName().toRawUTF8());
     std::printf ("rendered %d s in %.0f ms (%.0fx realtime), peak %.3f, finite %s\n", seconds, ms, seconds * 1000.0 / ms, peak, bad ? "NO" : "yes");
     std::printf ("state: %d bytes, relief round-trip max error %.6f, frames %d -> %d\n", (int) state.getSize(), maxDiff, r1.frames, r2.frames);
     std::printf ("wrote %s\n", out.getFullPathName().toRawUTF8());
